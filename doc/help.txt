@@ -1,0 +1,10 @@
+USAGE:
+1) help --- Print this message
+2) list --- Print a list of the projects
+3) newproject [name project] --- Create a new empty project
+4) start [name project] --- Start a new session
+5) stop --- Stop the started session
+6) [name project] --- Print all the sessions of the project
+6) export [name project] --- Export the project in the Export folder
+7) deleteproject [name project] --- Delete the project
+7) quit --- Exit the program
