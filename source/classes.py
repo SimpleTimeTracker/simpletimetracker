@@ -2,8 +2,6 @@ from __future__ import print_function
 import time
 from source import jsonpickle
 
-class List():
-    list=[]
 
 class Project():
     name = ''
