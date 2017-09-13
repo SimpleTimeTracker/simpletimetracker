@@ -4,7 +4,7 @@ def projectExport(obj, pricePerH):
     fp.write(obj.name + '\n\n')
     fp.write("SESSIONS:\n")
     fp.write("STARTED\t\t\tENDED\t\t\tTIME WORKED\n")
-    for el in obj.sessions[1:]:
+    for el in obj.sessions:
         fp.write(_create_string(el))
     fp.write("\nTOTAL WORKED: ")
     fp.write(_string_worked(_get_total_worked(obj.sessions)))
