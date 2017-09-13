@@ -1,60 +1,97 @@
-"""Usage:
-    stt.py -h | --help | --version
-    stt.py list
-    stt.py newproject <project>
-    stt.py deleteproject <project>
-    stt.py start <project>
-    stt.py stop <project>
-    stt.py export <project> [-p VALUE]
-    stt.py <project>
-
-Options:
-    -p --price      your price per hour
-"""
+from __future__ import print_function
+from source import classes
+from source import export_def as exp
 import atexit
 
-from docopt import docopt
-from source.db_def import _loadDb, deleteProject, getLastStarted, getProject, closing
-from source.print_def import printList, printSessions, printWorked
-from source.classes import Project, Session
-
-
-if __name__ == '__main__':
-    ARGUMENTS = docopt(__doc__, version='1.0.0rc')
+START = "------SIMPLE TIME TRACKER------\nTYPE \"help\" IF YOU NEED"
+help_file = open("doc/help.txt")
+HELP = help_file.read()
+help_file.close()
 
 try:
-    FP = open("source/db_001.json")
-    DB = _loadDb(FP)
-    FP.close()
-except IOError:
-    DB = []
+    fp=open("source/db_001.json")
+    db = classes._load_db(fp)
+    fp.close()
+except:
+    db = []
 
-if ARGUMENTS['list']:
-    printList(DB)
+print(START)
+print("Active Projects: " + str(len(db)))
+command = ''
+while command != 'quit':
+    command=raw_input("\nInsert the command: ")
+    if command == 'list':
+        classes._print_list(db)
 
-elif ARGUMENTS['newproject']:
-    NEWPROJECT = Project()
-    NEWPROJECT.add_project(DB, ARGUMENTS['<project>'])
+    elif command == 'help':
+        print(HELP)
 
-elif ARGUMENTS['deleteproject']:
-    deleteProject(DB, ARGUMENTS['<project>'])
+    elif command[:11] == "newproject ":
+        i = classes._check_db_name(db, command[11:len(command)])
+        if i != "ERROR":
+            print("Error, the project already exists. Retry")
+            continue
+        classes._new_project(db, command)
 
-elif ARGUMENTS['start']:
-    NEWSESSION = Session()
-    NEWSESSION.get_time_start(DB, ARGUMENTS['<project>'])
+    elif command[:14] == "deleteproject ":
+        i = classes._check_db_name(db, command[14:len(command)])
+        if i == "ERROR":
+            print("Error in the name of the project. Retry")
+            continue
+        while True:
+            choose = raw_input("Do you really want to delete the project? (y/n): ")
+            if choose == 'n':
+                break
+            elif choose == 'y':
+                del db[i]
+            else:
+                print("Please insert y as yes or n as no.")
+            break
 
-elif ARGUMENTS['stop']:
-    SESSION = getLastStarted(DB, ARGUMENTS['<project>'])
-    SESSION.get_time_end_n_worked()
-    printWorked(SESSION)
+    elif command[:6] == 'start ':
+        i = classes._check_db_name(db, command[6:len(command)])
+        if i == "ERROR":
+            print("Error in the name of the project. Retry")
+            continue
+        project = classes.Project()
+        session = classes.Session()
+        session.time_start = classes._get_time()
+        session.time_worked = []
+        while command != 'stop':
+            command = raw_input("Well done, return here when you finish your job to stop me...\n")
+            if command == 'stop':
+                session.time_end = classes._get_time()
+                classes._print_worked(session)
+                db[i].sessions.append(session)
 
-elif ARGUMENTS['export']:
-    PROJECT = getProject(DB, ARGUMENTS['<project>'])
-    PROJECT.export_project(ARGUMENTS['VALUE'])
+    elif command[:7] == 'export ':
+        i = classes._check_db_name(db, command[7:len(command)])
+        if i == "ERROR":
+            print("Error in the name of the project. Retry")
+            continue
+        while True:
+            choose = raw_input("Do you want to calculate the total price(y/n): ")
+            if choose == 'n':
+                exp._project_export(db[i], 0)
+                break
+            elif choose == 'y':
+                while True:
+                    try:
+                        pricePerH = int(raw_input("Insert your price per hour: "))
+                    except:
+                        print("Invalid number, try again.")
+                        continue
+                    exp._project_export(db[i], pricePerH)
+                    break
+            else:
+                print("Please insert y as yes or n as no.")
+            break
 
-else:
-    PROJECT = getProject(DB, ARGUMENTS['<project>'])
-    printSessions(PROJECT)
+    elif command != 'quit':
+        i = classes._check_db_name(db, command)
+        if i == "ERROR":
+            print("Error in the name of the project. Retry")
+            continue
+        classes._print_sessions(db, i)
 
-
-atexit.register(closing, DB)
+g = atexit.register(classes._closing, db)
