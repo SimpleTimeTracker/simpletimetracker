@@ -1,4 +1,4 @@
-def _project_export(obj, pricePerH):
+def projectExport(obj, pricePerH):
     namefile = 'Export/' + obj.name + '_export.txt'
     fp = open(namefile, "w")
     fp.write(obj.name + '\n\n')
@@ -24,46 +24,46 @@ def _create_string(obj):
 def _string_date(obj):
     string = ''
     for el in obj[:2]:
-        string += ( str(el).zfill(2) + '/')
+        string += (str(el).zfill(2) + '/')
     string += (str(obj[2]).zfill(2) + '  ')
     return string
 
 def _string_hour(obj):
-    string=''
+    string = ''
     string += (str(obj[3]).zfill(2)+':'+str(obj[4]).zfill(2)+'       ')
     return string
 
 def _string_worked(obj):
     string = ''
     flag = 0
-    i=0
+    i = 0
     for el in obj:
         if el != 0 or flag == 1:
             string += (str(el) + ' ')
             if i == 0:
                 string += 'Years '
                 flag = 1
-            elif i==1:
+            elif i == 1:
                 string += 'Months '
                 flag = 1
-            elif i==2:
+            elif i == 2:
                 string += 'Days '
                 flag = 1
-            elif i==3:
+            elif i == 3:
                 string += 'Hours '
                 flag = 1
-            elif i==4:
+            elif i == 4:
                 string += 'Mins '
                 flag = 1
-            elif i==5:
+            elif i == 5:
                 string += 'Secs '
                 flag = 1
-        i+=1
+        i += 1
     return string
 
 def _get_total_worked(obj):
     flag = 0
-    total = [0,0,0,0,0,0]
+    total = [0, 0, 0, 0, 0, 0]
     for el in obj[1:]:
         for i in range(6):
             total[i] += el.time_worked[i]
@@ -84,7 +84,7 @@ def _get_total_worked(obj):
                 if total[i] >= 30:
                     total[i] -= 30
                     total[i-1] += 1
-                    flag =  0
+                    flag = 0
             elif i == 1:
                 if total[i] >= 12:
                     total[i] -= 12
@@ -93,8 +93,8 @@ def _get_total_worked(obj):
     return total
 
 def _get_cash(obj, pricePerH):
-    cash=0
-    hours =     ((obj[0]*8760) + (obj[1]) * 720) + (obj[2] * 24 ) + (obj[3])
+    cash = 0
+    hours = ((obj[0]*8760) + (obj[1]) * 720) + (obj[2] * 24) + (obj[3])
     cash += hours * pricePerH
     secs = ((obj[4] * 60) + obj[5])
     cash += secs * (pricePerH/3600)

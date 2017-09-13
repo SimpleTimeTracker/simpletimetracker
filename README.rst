@@ -6,6 +6,4 @@ For every project you can have all the work/study sessions you want and at the e
 
 To open the application, simply type: "python stt.py"
 
-For more help type "help" in the application.
-
-
+For the options type "python stt.py -h".
