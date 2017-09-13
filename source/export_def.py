@@ -64,7 +64,7 @@ def _string_worked(obj):
 def _get_total_worked(obj):
     flag = 0
     total = [0, 0, 0, 0, 0, 0]
-    for el in obj[1:]:
+    for el in obj:
         for i in range(6):
             total[i] += el.time_worked[i]
     while flag == 0:
